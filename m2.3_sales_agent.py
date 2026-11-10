@@ -56,10 +56,29 @@ try:
     )
     print(result["messages"][-1].text)
 
-    png_bytes = backend.read("/genre_revenue.png")
+
+    downloads = backend.download_files(["/genre_revenue.png"])
+
+    download = downloads[0]
+
+    if download.error:
+        raise RuntimeError(
+            f"Failed to download chart: {download.error}"
+        )
+
+    if download.content is None:
+        raise RuntimeError("Chart download returned no content")
+
     out_path = Path(__file__).parent / "genre_revenue.png"
-    out_path.write_bytes(png_bytes)
-    print(f"Chart saved to {out_path}")
+
+    out_path.write_bytes(download.content)
+
+    print(f"Chart saved locally to: {out_path.resolve()}")
+
+
+    
+
+
 
 finally:
     interpreter.stop()
